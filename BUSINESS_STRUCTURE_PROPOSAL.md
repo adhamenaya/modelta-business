@@ -248,9 +248,9 @@ modelta-business/
 │
 ├── 📊 reports/
 │   ├── quarterly-reports/
-│   │   └── Q1-2024-report.md
+│   │   └── Q1-2026-report.md
 │   ├── annual-reports/
-│   │   └── 2024-annual-report.md
+│   │   └── 2026-annual-report.md
 │   └── analysis/
 │       ├── market-research.md
 │       ├── competitor-benchmarking.md
@@ -264,11 +264,11 @@ modelta-business/
 │   └── status-report-template.md
 │
 ├── 📅 projects/
-│   ├── 2024-roadmap.md
-│   ├── 2024-q1-initiatives.md
-│   ├── 2024-q2-initiatives.md
-│   ├── 2024-q3-initiatives.md
-│   └── 2024-q4-initiatives.md
+│   ├── 2026-roadmap.md
+│   ├── 2026-q1-initiatives.md
+│   ├── 2026-q2-initiatives.md
+│   ├── 2026-q3-initiatives.md
+│   └── 2026-q4-initiatives.md
 │
 ├── 💡 innovation-lab/
 │   ├── future-features-research.md
@@ -364,7 +364,7 @@ Glossary, industry standards, best practices, and reference materials.
 - Use **kebab-case** for all files: `marketing-strategy.md`
 - Use **snake_case** for directories with multiple words: `customer-personas/`
 - Use **UPPERCASE** for main files: `README.md`, `STRUCTURE.md`
-- Prefix files with date when relevant: `2024-q1-roadmap.md`
+- Prefix files with date when relevant: `2026-q1-roadmap.md`
 
 ---
 
