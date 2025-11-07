@@ -1,0 +1,64 @@
+# OS Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary Files
+*.tmp
+*.bak
+*.backup
+*.log
+
+# Sensitive Information
+.env
+.env.local
+secrets/
+**/credentials.json
+**/api-keys.txt
+
+# Generated Files
+node_modules/
+dist/
+build/
+*.pdf  # Generated PDFs (keep source docs)
+
+# Data Files
+*.csv
+*.xlsx
+*.xls
+*.db
+*.sqlite
+
+# Archive Files
+*.zip
+*.tar.gz
+*.rar
+
+# Mac
+.DS_Store
+
+# Compiled Files
+*.pyc
+__pycache__/
+*.o
+*.a
+
+# Dependencies
+venv/
+env/
+.venv/
+
+# CI/CD
+.github/workflows/local/
+.gitlab-ci.local.yml
+
+# Editor Backups
+.~*
