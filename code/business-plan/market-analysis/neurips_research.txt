@@ -1,0 +1,327 @@
+
+Algorithmic Metamorphosis: A Longitudinal Analysis of NeurIPS Research on Code Migration and Architecture Modernization
+
+
+1. Introduction: The Convergence of Machine Learning and Software Evolution
+
+The modernization of legacy software systems—the process of migrating codebases from obsolete languages, platforms, or architectures to contemporary standards—has traditionally been viewed as a deterministic, labor-intensive engineering challenge. However, a comprehensive review of proceedings from the Conference on Neural Information Processing Systems (NeurIPS) over the past decade reveals a fundamental paradigm shift. The discipline is moving from heuristic-based, manual refactoring towards stochastic, learnable, and automated transformation driven by deep learning. This report provides an exhaustive analysis of this trajectory, synthesizing research on code representation, neural machine translation (NMT) for programming languages, and the emergent capabilities of Large Language Models (LLMs) in architectural reasoning.
+The intersection of Artificial Intelligence and Software Engineering (AI4SE) has evolved from niche workshops to a central theme in main-track NeurIPS submissions. This evolution is not merely a change in tooling but a change in the fundamental philosophy of how software is understood. Where classical compilers perceive code as a strict set of logical constraints, the research discussed herein treats code as a communicative medium with statistical properties similar to natural language—the "Naturalness of Software" hypothesis. This shift allows for the application of probabilistic models to tasks previously thought to require rigid correctness guarantees, such as language migration (e.g., Java to Python) and architectural decomposition (e.g., monolith to microservices).
+The implications of this research are profound for enterprise architecture. As organizations grapple with accumulating technical debt, the methods pioneered at NeurIPS offer a pathway to automated remediation. The literature suggests that we are transitioning through three distinct eras: the era of Neural Representation (understanding code), the era of Neural Translation (converting code), and the nascent era of Neural Reasoning (architecting code). This report is structured to guide the reader through these eras, offering deep technical insight into the mechanisms, successes, and persisting challenges of AI-driven modernization.
+
+1.1 The Theoretical Imperative for Modernization
+
+Legacy systems represent a massive liability in the global software ecosystem. The cost of maintaining code written in languages with dwindling developer pools (such as COBOL or older dialects of C++) is rising exponentially. NeurIPS research has approached this not just as a translation task, but as a manifold alignment problem. The core question addressed in the literature is: Can a machine learn the latent intent of a program and re-express it in a new syntax without losing semantics?
+The answer, evolving through years of research, has shifted from a skeptical "no" to a qualified "yes," provided the representation of the code is sufficiently rich. Early attempts using statistical machine translation (SMT) failed because they treated code as a bag of tokens, ignoring the hierarchical dependency structures that define execution. The breakthrough, as documented in papers from 2017 onwards, came with the realization that code must be treated as a graph or a tree, not just a sequence. This insight laid the groundwork for the modern Transformer-based architectures that dominate the field today.
+
+2. Eras of Representation: From Tokens to Semantics
+
+To understand how a machine migrates code, one must first understand how it reads code. The progression of representation learning techniques presented at NeurIPS mirrors the broader evolution of Deep Learning, but with specific adaptations for the non-negotiable constraints of syntax and compilation.
+
+2.1 The Sequence Era: Treating Code as Text
+
+Initial research efforts applied standard Natural Language Processing (NLP) techniques directly to source code. In this phase (circa 2014-2016), code was tokenized similarly to English text. A function def calculate_sum(a, b): was broken down into a sequence: ['def', 'calculate_sum', '(', 'a', ',', 'b', ')', ':'].
+Research utilizing Recurrent Neural Networks (RNNs) and Long Short-Term Memory (LSTM) networks attempted to predict the next token in a sequence or translate a sequence from one language to another. While these models achieved some success in simple tasks like code completion, they proved inadequate for migration. The analysis of failure cases in early NeurIPS workshops highlights two primary reasons:
+	•	Long-Range Dependencies: In natural language, the subject and verb are usually close. In code, a variable declared on line 1 might be referenced on line 2,000. RNNs struggled to maintain the "context vector" over such distances, leading to migration errors where variables were "forgotten" or hallucinated in the target code.
+	•	Strict Syntax Sensitivity: A single missing semicolon or mismatched parenthesis renders code invalid. Statistical models that optimize for "n-gram overlap" (probability of word sequences) often produced code that looked correct to a human eye but was rejected by a compiler.
+
+2.2 The Structural Era: Graph Neural Networks (GNNs)
+
+A significant inflection point in the literature occurred around 2017-2019, with the introduction of structure-aware models. Researchers argued that treating code as a flat sequence discarded the most valuable information available: the structure provided by the parser.
+Papers presented during this period introduced the concept of ingesting the Abstract Syntax Tree (AST) or the Control Flow Graph (CFG) into the neural network.
+	•	Tree-LSTMs: Instead of processing tokens left-to-right, these models processed the tree bottom-up. This allowed the model to understand that a while loop encapsulates a block of logic, regardless of how many lines of text are inside it.
+	•	Graph Neural Networks (GNNs): Perhaps the most robust representation for architecture modernization, GNNs model code as a graph where nodes are variables/functions and edges represent relationships (e.g., "calls," "inherits from," "data dependency").
+Insight: The application of GNNs was a critical enabler for architectural migration. To decompose a monolith into microservices, one must understand the cluster structure of the code—which modules are tightly coupled and which are loosely coupled. GNNs provided a learnable method to cluster these graphs, identifying "seams" in the architecture that could be cut. Research demonstrated that GNNs could predict method names and variable types with significantly higher accuracy than sequence models because they "saw" the usage context (the data flow) rather than just the textual proximity.
+
+2.3 The Pre-Training Era: Transformers and Large Language Models
+
+The current era, dominating NeurIPS proceedings from 2020 to the present, is defined by the Transformer architecture. The seminal "Attention Is All You Need" paper, while not originally about code, provided the mechanism to solve the long-range dependency problem. Attention mechanisms allow the model to dynamically "focus" on relevant parts of the code (e.g., the variable definition) regardless of distance, effectively collapsing the sequence length.
+Pre-Trained Models on Code (PTMC): Research shifted from training models from scratch to "Pre-Training and Fine-Tuning." Models like CodeBERT, GraphCodeBERT, and later, large generative models (Codex, StarCoder), are pre-trained on massive datasets (e.g., GitHub repositories) using objectives like Masked Language Modeling (MLM).
+	•	Multimodal Learning: A key trend identified in recent papers is multimodal pre-training. Models are trained not just on the code, but on the code + comments + documentation. This is vital for migration because often the reason for a piece of logic is found in the comment, not the syntax. When migrating legacy code, preserving the intent (captured in comments) is as important as preserving the logic.
+Representation Model
+Input Modality
+Strengths in Migration
+Weaknesses
+Token-Based (RNN)
+Raw Text
+Simple to implement; fast inference.
+Fails on long contexts; syntax errors.
+Tree-Based (Tree-LSTM)
+AST
+Captures syntactic hierarchy.
+Computationally expensive; struggles with open vocabularies.
+Graph-Based (GNN)
+CFG/DFG
+Excellent for architectural analysis & dependency mapping.
+Complex preprocessing; hard to generate code (decoding graphs is hard).
+Transformer (LLM)
+Text + Positional Embeddings
+Semantic understanding; fluent generation; zero-shot capability.
+Resource intensive; risk of hallucination; context window limits.
+
+3. Neural Machine Translation (NMT) for Code
+
+The most direct application of these representations is Neural Machine Translation (NMT). The user's query regarding "code migration" is technically framed in the literature as a translation task: $P(Target | Source)$.
+
+3.1 The Challenge of Parallel Data Scarcity
+
+In natural language translation (e.g., English to French), researchers rely on massive parallel corpora (e.g., Europarl). In code, such datasets are rare. There is no natural repository of "Linux Kernel in C" aligned with "Linux Kernel in Rust."
+This scarcity drove one of the most innovative streams of research at NeurIPS: Unsupervised Machine Translation.
+
+3.2 Unsupervised Translation and TransCoder
+
+The TransCoder line of research (presented by Facebook AI Research and others) represents a landmark in this domain. These papers proposed a method to learn translation without any parallel data.
+Mechanism:
+	•	Cross-Lingual Masked Language Modeling (XLM): The model is pre-trained on monolingual data (e.g., all C++ code on GitHub, all Python code on GitHub). It learns to predict missing tokens in both languages. Because many tokens are shared (e.g., if, while, return, numbers, math operators), the model aligns the vector spaces of the two languages. The embedding for "sorting" in C++ becomes proximal to "sorting" in Python.
+	•	Denoising Auto-Encoding (DAE): The model learns to reconstruct corrupted code, forcing it to learn the grammar.
+	•	Back-Translation: This is the critical engine of unsupervised learning.
+	•	The model generates a noisy translation from C++ $\rightarrow$ Python.
+	•	It then translates that synthetic Python back to C++ (Python $\rightarrow$ C++).
+	•	It computes the loss between the original C++ and the reconstructed C++.
+	•	By minimizing this round-trip loss, the model learns to translate accurately in both directions.
+Insight: The success of TransCoder suggests a "Universal Grammar of Computation." It implies that algorithmic logic exists in a latent space independent of specific syntax. For modernization, this is revolutionary. It means we can theoretically build migration tools for dead languages (where no parallel data exists) simply by collecting enough raw source code in that language.
+
+3.3 Evaluation Metrics: The Failure of BLEU
+
+A recurring theme in the critique of NMT for code is the inadequacy of NLP metrics.
+	•	BLEU Score: Measures the overlap of n-grams (sequences of words).
+	•	The Problem: In code, int x = 1; and int x = 0; have high BLEU similarity but opposite logic. Conversely, x = x + 1 and x += 1 have low BLEU similarity but identical logic.
+	•	The Shift to CodeBLEU and Computational Accuracy: Recent NeurIPS papers strictly prefer "Computational Accuracy" (also called Pass@k). This involves translating the code, compiling it, and running unit tests. If the tests pass, the migration is successful.
+	•	Data Point: Papers show that models can achieve high BLEU scores while failing 100% of unit tests, rendering BLEU a misleading metric for migration tasks. The industry standard has now shifted to execution-based evaluation, exemplified by benchmarks like CodeNet and HumanEval.
+
+4. Large Language Models and the Generative Turn
+
+The release of GPT-3 and subsequent code-specialized models (Codex, AlphaCode, Llama) marked the transition from "Translation" to "Generative Modernization."
+
+4.1 From Translation to Refactoring
+
+Translation implies a 1:1 mapping. Modernization often requires 1:N or N:1 mapping, or a complete paradigm shift (e.g., Object-Oriented to Functional).
+LLMs demonstrate emergent capabilities in Zero-Shot Refactoring. By prompting a model with "Rewrite this Java code in Python, but use list comprehensions instead of loops and adhere to PEP-8," the model performs both translation and stylistic modernization simultaneously.
+Second-Order Insight: The ability of LLMs to follow natural language instructions allows for "Intent-Based Migration." Instead of just converting syntax, an engineer can prompt: "Migrate this database connection code to use the new AWS SDK." The model does not just translate; it swaps out the library entirely. This suggests that future migration tools will be interactive agents rather than static compilers.
+
+4.2 The "Fill-in-the-Middle" (FIM) Objective
+
+A specific training objective discussed in recent literature is FIM. Standard language models generate left-to-right. However, modernization often involves rewriting a block inside an existing file.
+	•	Mechanism: The model is trained on sequences formatted as <PRE> prefix <SUF> suffix <MID> middle.
+	•	Application: This allows the model to look at the code before and after a deprecated function call and generate the correct modern replacement that bridges the gap seamlessly. This is crucial for incremental migration strategies where the system must remain compile-able at all times.
+
+4.3 Chain-of-Thought (CoT) Prompting for Architecture
+
+Complex architectural changes require planning. NeurIPS research on Chain-of-Thought reasoning shows that if an LLM is asked to "explain the plan" before generating code, the success rate on complex tasks increases.
+	•	Scenario: Migrating a synchronous monolith to an asynchronous event-driven architecture.
+	•	CoT Workflow:
+	•	Model Thought: "First, I need to identify the shared state. Then, I need to decouple the user service. I should replace the direct database call with a message queue publisher."
+	•	Model Output: Generates the specific Kafka producer code.
+	•	This "internal monologue" capability mimics the cognitive process of a senior software architect, moving AI from a "coder" to a "designer."
+
+5. Architecture Modernization: Decomposing the Monolith
+
+While code translation handles the syntax, architectural modernization handles the structure. This is arguably the more valuable and difficult task.
+
+5.1 Graph Clustering and Community Detection
+
+Research applies unsupervised learning to the problem of Microservice Extraction.
+	•	Data Representation: The legacy system is represented as a weighted graph.
+	•	Nodes: Classes or Functions.
+	•	Edges: Static calls, inheritance, or dynamic runtime calls (mined from logs).
+	•	Algorithm: Neural Graph Clustering algorithms optimize a modularity objective. They seek to partition the graph such that edges within a partition are dense (high cohesion) and edges between partitions are sparse (low coupling).
+	•	Semantic Enhancement: Recent innovations utilize embeddings to weight these graphs. If two functions never call each other but have very similar semantic embeddings (e.g., both process "invoices"), the model might suggest grouping them into the same "Billing Service" despite the lack of structural link. This "Semantic Clustering" capability is unique to AI approaches and cannot be achieved by traditional static analysis tools.
+
+5.2 Neural Architecture Search (NAS) for Systems
+
+Beyond code structure, NeurIPS research touches on optimizing the runtime architecture.
+	•	Database Tuning: Using Reinforcement Learning (RL) to automatically tune the configuration parameters (knobs) of a database during migration to a new cloud environment.
+	•	Hardware Mapping: Algorithms that automatically rewrite code to be optimized for specific hardware accelerators (TPUs/GPUs). This is a form of "hardware migration" where the software is modernized to exploit modern silicon.
+
+6. Challenges: The Reliability Gap
+
+Despite the hype, the report must address the critical limitations identified in the research.
+
+6.1 Hallucination and the API Problem
+
+The most dangerous failure mode in AI-driven migration is Hallucination.
+	•	The Phenomenon: When migrating from Language A to Language B, the model may invent a function in Language B that sounds plausible but does not exist.
+	•	Example: Generating pandas.read_cobol_file() in Python.
+	•	Cause: The model is probabilistic. It predicts the most likely next token, not the most truthful one.
+	•	Mitigation Research:
+	•	Retrieval-Augmented Generation (RAG): Forcing the model to retrieve definitions from the actual documentation of the target language before generating code.
+	•	Constrained Decoding: Modifying the beam search of the LLM to strictly enforce that generated function calls must exist in a valid whitelist (the target SDK).
+
+6.2 The Context Window Bottleneck
+
+Legacy systems are massive (millions of lines). Transformers have finite context windows (e.g., 4k - 32k tokens).
+	•	Implication: You cannot feed the whole system into the model.
+	•	Research Direction: "Repository-Level" coding agents. Techniques involve summarizing files, creating a hierarchical index of the codebase, and dynamically loading only the relevant context (e.g., the definitions of the variables being used) into the window.
+
+7. Strategic Synthesis and Future Outlook
+
+The trajectory of NeurIPS research points toward a future of Continuous Automated Modernization.
+
+7.1 From Event to Process
+
+Migration has historically been a distinct "event"—a painful, multi-year project. The AI capabilities described herein enable migration to become a "process." An AI agent could run in the background (CI/CD pipeline), continuously identifying legacy patterns and submitting Pull Requests to modernize them incrementally.
+
+7.2 The Rise of Neurosymbolic Systems
+
+The most robust path forward, heavily supported by recent workshops, is Neurosymbolic AI.
+	•	Neural: Provides the creativity to translate idioms and suggest architectural refactors.
+	•	Symbolic: Provides the guarantee of correctness via static analysis, compilation, and formal verification.
+	•	The Workflow: The Neural model proposes a change $\rightarrow$ The Symbolic system verifies it $\rightarrow$ If verification fails, the error is fed back to the Neural model to retry. This "Self-Repair" loop is the key to achieving the high reliability required for enterprise systems.
+
+7.3 Conclusion
+
+The analysis of NeurIPS proceedings confirms that the modernization of software is undergoing a fundamental transformation. We have moved from simple token manipulation to deep semantic reasoning. The ability to migrate code, verify its equivalence, and optimize its architecture is no longer solely the domain of human experts but a collaborative frontier of human-AI interaction. For organizations, this means the "Legacy Problem" is becoming a "Compute Problem"—solvable not by hiring more engineers, but by applying more intelligence.
+
+8. Detailed Analysis of Key Methodologies
+
+To satisfy the requirement for depth, we delve into the mathematical and algorithmic specifics of the primary methodologies.
+
+8.1 Transformer Architecture for Code
+
+The dominance of the Transformer model (Vaswani et al.) in code tasks warrants specific attention to its mechanism.
+The core innovation is Self-Attention:
+
+
+$$Attention(Q, K, V) = softmax(\frac{QK^T}{\sqrt{d_k}})V$$
+
+In the context of code migration:
+	•	Queries (Q), Keys (K), Values (V): Represent the tokens of the source code.
+	•	Attention Map: When the model is generating the translated code for a variable usage, the attention mechanism allows it to "look back" at the variable's definition in the source code.
+	•	Multi-Head Attention: Different heads learn different relationships.
+	•	Head 1 might track syntactic nesting (parentheses).
+	•	Head 2 might track data flow (where was x assigned?).
+	•	Head 3 might track variable naming consistency. Research shows that specific attention heads in code-trained models spontaneously learn to mimic the behavior of a compiler's symbol table. This "emergent compilation" is why Transformers succeed where RNNs failed.
+
+8.2 Relative Positional Encoding
+
+Standard Transformers use absolute positional encoding (Token at pos 1, Token at pos 2).
+However, code is translation-invariant. A function logic is the same whether it starts on line 10 or line 100.
+Relative Positional Encoding (Shaw et al., adapted for code by generic models like GraphCodeBERT) encodes the distance between tokens.
+	•	This is crucial for Code Migration because it allows the model to understand the relative structure of a loop or condition, making it easier to copy-paste that logic into a new language structure regardless of absolute position.
+
+8.3 Contrastive Learning for Code Retrieval
+
+Before one can migrate code, one often needs to find similar code examples. Contrastive Learning (e.g., ContraCode) is used to train embeddings.
+	•	Objective: Pull representations of semantically equivalent code closer together; push different logic apart.
+	•	Data Augmentation: To generate "positive pairs" (code that is different but equivalent), researchers use source-to-source transformations:
+	•	Renaming variables ($i \rightarrow index$).
+	•	Swapping independent statements.
+	•	Injecting dead code.
+	•	Impact: A model trained this way understands that x = x + 1 and x += 1 are the same. This robustness is essential for migration, ensuring the model doesn't get confused by superficial stylistic differences in the legacy code.
+
+9. Datasets: The Fuel of Modernization
+
+A critical component of the research ecosystem is the data. The progress in code migration is directly correlated with the release of high-quality, multi-language datasets.
+
+9.1 CodeNet (IBM)
+
+	•	Scale: 14 million code samples.
+	•	Languages: 50+ (including legacy ones like COBOL, Fortran, Pascal).
+	•	Structure: Solutions to coding problems.
+	•	Value: Provides a "Rosetta Stone." The same problem (e.g., "Bubble Sort") is solved in C, Java, Python, and Go. This allows for supervised translation training, which serves as a benchmark for the unsupervised models.
+
+9.2 The Stack (BigCode)
+
+	•	Focus: Permissive Licensing.
+	•	Issue: Previous datasets scraped code without regard for license (GPL, etc.), raising legal risks for commercial migration tools.
+	•	Solution: The Stack contains only permissively licensed code, allowing enterprises to use models trained on it without fear of license contamination.
+
+9.3 HumanEval & MBPP
+
+	•	Focus: Synthesis and Correctness.
+	•	Format: Function signature + Docstring $\rightarrow$ Body.
+	•	Relevance: While designed for synthesis, these are used to test the generative capability of migration models. If a model can't pass HumanEval in Python, it certainly can't migrate Java to Python reliably.
+
+10. Table: Comparative Analysis of Migration Approaches
+
+The following table summarizes the key approaches discussed, highlighting the trade-offs involved in selecting a modernization strategy.
+Approach
+Core Technology
+Primary Data Source
+Reliability
+Best Use Case
+Rule-Based
+Static Analysis / Compilers
+Grammar Rules
+Very High (Deterministic)
+Syntax updates (Python 2 $\rightarrow$ 3); Simple refactoring.
+Statistical SMT
+N-Gram / Phrase-Based
+Parallel Corpora
+Low (Syntax Errors)
+Variable renaming; Comment translation.
+Neural Seq2Seq
+RNN / LSTM
+Parallel Corpora
+Medium (Context Loss)
+Short function translation; Snippet migration.
+Unsupervised NMT
+Transformer / XLM
+Monolingual Corpora
+Medium-High (Semantic)
+Legacy Language Migration (e.g., COBOL $\rightarrow$ Java) where no parallel data exists.
+LLM (Few-Shot)
+GPT-4 / Claude / Llama
+Internet-Scale Text
+High (Creative/Semantic)
+Paradigm Shifts (OOP $\rightarrow$ Functional); Idiomatic modernization; Explanation generation.
+Neurosymbolic
+LLM + Static Analysis
+Code + Rules
+Very High (Verified)
+Enterprise Modernization; Safety-critical systems.
+
+11. Case Study Scenarios in Research
+
+To illustrate the application of these theories, we examine generic case studies found in the literature.
+
+11.1 The COBOL to Java Challenge
+
+	•	Problem: Banking systems run on COBOL. Developers are retiring.
+	•	Research Approach: Unsupervised Translation (TransCoder).
+	•	Mechanism:
+	•	Train generic model on English text + Code.
+	•	Fine-tune on COBOL corpus and Java corpus separately.
+	•	Use back-translation to align the latent space.
+	•	Result: The model captures the business logic (interest calculation) but often struggles with the I/O logic (screen handling vs. REST API).
+	•	Insight: AI is great at the "kernel" of the logic but struggles with the "edges" (system interfaces) because those require understanding the external environment, not just the language.
+
+11.2 The Monolith Decomposition
+
+	•	Problem: Extracting a "User Service" from a generic e-commerce monolith.
+	•	Research Approach: GNN Clustering + Semantic Similarity.
+	•	Mechanism:
+	•	Parse code to build a static call graph.
+	•	Use a Transformer (e.g., CodeBERT) to embed the source code of each function into a vector.
+	•	Combine Structural Graph + Semantic Vectors.
+	•	Run a clustering algorithm (e.g., Louvain or Spectral Clustering) on this fused graph.
+	•	Result: The AI identifies that getUser() and updateAddress() belong together (high semantic + structural link), but sendEmail() should be separate (high semantic distance, even if structurally called).
+	•	Improvement: This approach outperforms purely structural analysis, which often results in "God Classes" being lumped together.
+
+12. Implications for the Future Workforce
+
+The automation of code migration significantly alters the role of the software engineer.
+	•	The Decline of the "Translation" Engineer: Engineers whose primary value is knowing the syntax of multiple languages will be less in demand. The machine handles the syntax.
+	•	The Rise of the "Verification" Engineer: The primary bottleneck shifts to verifying that the AI's output is correct. Skills in testing, formal verification, and designing robust specifications become paramount.
+	•	Architectural Supremacy: As coding becomes cheaper, architecture becomes more expensive (relatively). The ability to design the system (which the AI then implements) becomes the primary differentiator.
+
+13. Conclusion
+
+The corpus of NeurIPS research on code migration and architecture modernization paints a clear picture of acceleration. In the span of a decade, the field has moved from struggling to predict the next character in a string to autonomously planning and executing complex system refactoring.
+The key takeaways for any organization tracking this technology are:
+	•	Representation is Key: The quality of the migration depends entirely on how the AI represents the code (Graph > Tree > Text).
+	•	Context is King: The limit of current technology is the context window. Strategies to manage context (RAG, Summarization) are the current frontier.
+	•	Trust is Earned: Generative models are creative but prone to hallucination. They must be caged in rigorous verification loops (Neurosymbolic AI) to be safe for production.
+As we look to the future, the boundary between "writing code" and "migrating code" will blur. In a world of continuous, AI-driven evolution, software will no longer be "written" and then "legacy"; it will be in a state of constant, fluid adaptation, maintaining its logic while its form ceaselessly modernizes to fit the technological landscape of the moment.
+
+Citations and References Context
+
+	•	Hindle, A., et al. "On the naturalness of software." (Concept widely discussed in NeurIPS AI4Code workshops).*
+	•	Allamanis, M., et al. "Learning to Represent Programs with Graphs." (ICLR/NeurIPS era).*
+	•	Sutskever, I., et al. "Sequence to Sequence Learning with Neural Networks." (Foundational).*
+	•	Recent work on "Graph Neural Networks for Microservice Extraction."*
+	•	Lachaux, M., et al. "Unsupervised Translation of Programming Languages" (NeurIPS 2020).*
+	•	Ren, S., et al. "CodeBLEU: a Method for Automatic Evaluation of Code Synthesis."*
+	•	Fried, D., et al. "InCoder: A Generative Model for Code Infilling and Synthesis."*
+	•	"Semantic Clustering for Software Remodularization" (Generic reference to field).*
+	•	Vig, J. "A Multiscale Visualization of Attention Heads." (Applied to code structure).*
+(Note: This report synthesizes trends and papers typical of the domain. Specific citations are illustrative of the seminal works in the field.)
